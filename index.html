@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>Login - Train Management Dispatch System</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://tmdsfrs.bnsf.com/lib/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="https://tmdsfrs.bnsf.com/css/site.css">
+    
+</head>
+<body>
+<header class="text-center py-3 clsheader" style="margin-bottom: 0px;">
+    <h3 >Train Management and Dispatch System</h3>
+</header>
+
+<div class="container-fluid containerStyle" style="padding-top: 20px;">
+    <main role="main" class="pb-3">
+        <link rel="stylesheet" href="https://tmdsfrs.bnsf.com/css/Login.css">
+
+<div class="row justify-content-center m-0">
+    <div class="card col-md-4 border-0 rounded-0 p-4 shadow p-3 mb-5 p-0">
+        <div class="card-header text-center border-0 bg-white fontBolderStyle">
+            TMDS WebBrowser Login
+        </div>
+        <div class="card-body">
+            <form class='form-horizontal' method="post" id="Form1">
+                <div class="mb-3 p-0">
+                    <label for="ddUsers" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="ddUsers" name="username" placeholder="Enter Username" required data-val="true" data-val-required="The Username field is required.">
+                    <span id="reqvaliUser" class="req" style="display:none;">* Required</span>
+                </div>
+
+                <div class="mb-3 p-0">
+                    <label for="txtPwd" class="form-label">Password</label>
+
+                    <input type="password" class="form-control" id="txtPwd" name="password" placeholder="Enter Password"required>
+                    <span id="RequiredFieldValidator1" class="req" style="display:none;">* Required</span>
+                </div>
+                <!-- Removed below dont need anymore - Kristoffer S. -->
+                <!-- <div class="form-group row"> 
+                    <div class="col-sm-8 offset-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="chkRemember" name="chkRemember">
+                            <label class="form-check-label" for="chkRemember">Remember Me</label>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="mb-3 p-0"></div>
+                <input type="submit" class="btn btn-primary clsLogin" id="btnLogin" value="Login">
+            <input type="hidden" id="hidetxt" name="hidetxt"></form>
+        </div>        
+    </div>          
+</div>        
+    </main>
+</div>
+<footer class="border-top footer text-muted">
+    <div class="container" style="color: Black">
+        TMDS DON ViewClient <b>v1.0.1.0</b>
+        <span style="float: right; text-align: right; text-decoration: none">
+            &copy; Copyright PRS 2024
+        </span>
+    </div>
+</footer>   
+
+</body>
+<script defer>
+// Modified Script from DON.. Edited By Kristoffer S. 2024/02/15 //
+    const ddUsers = document.getElementById("ddUsers"),
+    btnLogin = document.getElementById("btnLogin"),
+    txtPwd = document.getElementById("txtPwd");
+// Kristoffer S Comment Regarding Drop Down Validation
+// Removed due to not needing this code anymore useless only for DROPDOWNS ONLY! // axios.get("/api/logins").then((response) => {
+//    response.data.forEach((e) => {
+//        let html = `<option value="${e.Username}">${e.Username}</option>`;
+//        ddUsers.innerHTML += html;
+//    });
+//}),
+btnLogin.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (validateLogin()) {
+        axios.post("/api/login", { username: ddUsers.value, password: txtPwd.value }) // Kristoffer S Comment // Removed the ddUsers.options and added ddUsers.value... this is the reason why it wont validate and page to /private/ but submit, used a good 80% of my brain power on this one.
+            .then((response) => {
+                let stringToken = response.data.Token + "//\\" + response.data.ExpiresAt + "//\\" + response.data.Username;
+                localStorage.setItem("tmdsAuthToken", stringToken);
+                window.location.href = "/private/";
+            })
+            .catch((error) => {
+                if (error.response && error.response.status === 401) {
+                    document.getElementById("lblErr").style.display = "block";
+                } else {
+                    console.error("Error logging in:", error);
+                }
+            });
+    }
+});
+
+const validateLogin = () => {
+    let valid = true;
+    document.getElementById("reqvaliUser").style.display = "none";
+    document.getElementById("RequiredFieldValidator1").style.display = "none";
+
+    if (ddUsers.value.length === 0 || ddUsers.value === "Please Select One") {
+        document.getElementById("reqvaliUser").style.display = "block";
+        valid = false;
+    }
+
+    if (txtPwd.value.length === 0) {
+        document.getElementById("RequiredFieldValidator1").style.display = "block";
+        valid = false;
+    }
+
+    return valid;
+};
+
+
+        </script>
+</html>
